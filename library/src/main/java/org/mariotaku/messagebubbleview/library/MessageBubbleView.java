@@ -1,0 +1,285 @@
+package org.mariotaku.messagebubbleview.library;
+
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Path.Direction;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
+import android.view.View;
+import android.widget.FrameLayout;
+
+/**
+ * Created by mariotaku on 14/11/24.
+ */
+public class MessageBubbleView extends FrameLayout {
+
+    public static final int NONE = 0x0;
+    public static final int TOP_LEFT = 0x1;
+    public static final int TOP_RIGHT = 0x2;
+    public static final int BOTTOM_LEFT = 0x3;
+    public static final int BOTTOM_RIGHT = 0x4;
+
+    public MessageBubbleView(Context context) {
+        this(context, null);
+    }
+
+    public MessageBubbleView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public MessageBubbleView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        setBackgroundDrawable(new BackgroundDrawable(getResources()));
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MessageBubbleView);
+        setCornerRadius(a.getDimensionPixelSize(R.styleable.MessageBubbleView_cornerRadius, 0));
+        setBubbleColor(a.getColorStateList(R.styleable.MessageBubbleView_bubbleColor));
+        setCaretPosition(a.getInt(R.styleable.MessageBubbleView_caretPosition, NONE));
+        a.recycle();
+    }
+
+    public void setBubbleColor(ColorStateList color) {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        ((BackgroundDrawable) background).setColor(color);
+    }
+
+    public void setCaretPosition(int position) {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        ((BackgroundDrawable) background).setCaretPosition(position);
+    }
+
+    public void setCornerRadius(float radius) {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        ((BackgroundDrawable) background).setCornerRadius(radius);
+    }
+
+    private static class BackgroundDrawable extends Drawable {
+
+        private final Paint mBubblePaint;
+        private final Path mBubblePath;
+        private final float mCaretWidth;
+        private final float mCaretHeight;
+
+        private final RectF mTempRectF = new RectF();
+
+        private int mCaretPosition;
+        private float mCornerRadius;
+        private ColorStateList mColor;
+
+        BackgroundDrawable(Resources resources) {
+            mCaretWidth = resources.getDisplayMetrics().density * 12;
+            mCaretHeight = mCaretWidth * 0.75f;
+            mBubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            mBubblePath = new Path();
+        }
+
+        @Override
+        public void draw(Canvas canvas) {
+            canvas.drawPath(mBubblePath, mBubblePaint);
+        }
+
+        private void setColor(ColorStateList color) {
+            mColor = color;
+            updateColor();
+        }
+
+        @Override
+        public boolean isStateful() {
+            return true;
+        }
+
+        @Override
+        protected boolean onStateChange(int[] state) {
+            updateColor();
+            return true;
+        }
+
+        private void updateColor() {
+            if (mColor == null) return;
+            final int color = mColor.getColorForState(getState(), mColor.getDefaultColor());
+            mBubblePaint.setColor(color);
+            invalidateSelf();
+        }
+
+        private void setCaretPosition(int position) {
+            mCaretPosition = position;
+            updatePath();
+            updateViewPadding();
+        }
+
+        @Override
+        protected void onBoundsChange(Rect bounds) {
+            super.onBoundsChange(bounds);
+            updatePath();
+            updateViewPadding();
+        }
+
+        private void updateViewPadding() {
+            final Callback callback = getCallback();
+            if (!(callback instanceof View)) return;
+            final View view = (View) callback;
+            switch (mCaretPosition) {
+                case TOP_LEFT:
+                case BOTTOM_LEFT:
+                    view.setPadding(Math.round(mCaretWidth), 0, 0, 0);
+                    break;
+                case TOP_RIGHT:
+                case BOTTOM_RIGHT:
+                    view.setPadding(0, 0, Math.round(mCaretWidth), 0);
+                    break;
+                default:
+                    view.setPadding(0, 0, 0, 0);
+                    break;
+            }
+        }
+
+        private void updatePath() {
+            final Rect bounds = getBounds();
+            final float radius = mCornerRadius;
+            final float caretWidth = mCaretWidth, caretHeight = mCaretHeight;
+            mBubblePath.reset();
+            switch (mCaretPosition) {
+                case TOP_LEFT: {
+                    updateTopLeftBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
+                    break;
+                }
+                case TOP_RIGHT: {
+                    updateTopRightBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
+                    break;
+                }
+                case BOTTOM_LEFT: {
+                    updateBottomLeftBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
+                    break;
+                }
+                case BOTTOM_RIGHT: {
+                    updateBottomRightBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
+                    break;
+                }
+                default: {
+                    updateRectBubble(mBubblePath, bounds, radius);
+                    break;
+                }
+            }
+            invalidateSelf();
+        }
+
+        private void updateRectBubble(Path path, Rect bounds, float radius) {
+            mTempRectF.set(bounds);
+            path.addRoundRect(mTempRectF, radius, radius, Direction.CW);
+        }
+
+        private void updateTopRightBubble(Path path, Rect bounds, float radius, float caretWidth,
+                                          float caretHeight) {
+            path.moveTo(bounds.right, bounds.top);
+            path.lineTo(bounds.right - caretWidth, bounds.top + caretHeight);
+            path.lineTo(bounds.right - caretWidth, bounds.bottom - radius);
+            path.cubicTo(bounds.right - caretWidth, bounds.bottom - radius / 2,
+                    bounds.right - caretWidth - radius / 2, bounds.bottom,
+                    bounds.right - caretWidth - radius, bounds.bottom);
+            path.lineTo(bounds.left + radius, bounds.bottom);
+            path.cubicTo(bounds.left + radius / 2, bounds.bottom,
+                    bounds.left, bounds.bottom - radius / 2,
+                    bounds.left, bounds.bottom - radius);
+            path.lineTo(bounds.left, bounds.top + radius);
+            path.cubicTo(bounds.left, bounds.top + radius / 2,
+                    bounds.left + radius / 2, bounds.top,
+                    bounds.left + radius, bounds.top);
+            path.close();
+        }
+
+
+        private void updateTopLeftBubble(Path path, Rect bounds, float radius, float caretWidth,
+                                         float caretHeight) {
+            path.moveTo(bounds.left, bounds.top);
+            path.lineTo(bounds.right - radius, bounds.top);
+            path.cubicTo(bounds.right - radius / 2, bounds.top,
+                    bounds.right, bounds.top + radius / 2,
+                    bounds.right, bounds.top + radius);
+            path.lineTo(bounds.right, bounds.bottom - radius);
+            path.cubicTo(bounds.right, bounds.bottom - radius / 2,
+                    bounds.right - radius / 2, bounds.bottom,
+                    bounds.right - radius, bounds.bottom);
+            path.lineTo(bounds.left + caretWidth + radius, bounds.bottom);
+            path.cubicTo(bounds.left + caretWidth + radius / 2, bounds.bottom,
+                    bounds.left + caretWidth, bounds.bottom - radius / 2,
+                    bounds.left + caretWidth, bounds.bottom - radius);
+            path.lineTo(bounds.left + caretWidth, bounds.top + caretHeight);
+            path.close();
+        }
+
+        private void updateBottomLeftBubble(Path path, Rect bounds, float radius, float caretWidth,
+                                            float caretHeight) {
+            path.moveTo(bounds.left, bounds.bottom);
+            path.lineTo(bounds.right - radius, bounds.bottom);
+            path.cubicTo(bounds.right - radius / 2, bounds.bottom,
+                    bounds.right, bounds.bottom - radius / 2,
+                    bounds.right, bounds.bottom - radius);
+            path.lineTo(bounds.right, bounds.top + radius);
+            path.cubicTo(bounds.right, bounds.top + radius / 2,
+                    bounds.right - radius / 2, bounds.top,
+                    bounds.right - radius, bounds.top);
+            path.lineTo(bounds.left + caretWidth + radius, bounds.top);
+            path.cubicTo(bounds.left + caretWidth + radius / 2, bounds.top,
+                    bounds.left + caretWidth, bounds.top + radius / 2,
+                    bounds.left + caretWidth, bounds.top + radius);
+            path.lineTo(bounds.left + caretWidth, bounds.bottom - caretHeight);
+            path.close();
+        }
+
+        private void updateBottomRightBubble(Path path, Rect bounds, float radius, float caretWidth,
+                                             float caretHeight) {
+            path.moveTo(bounds.right, bounds.bottom);
+            path.lineTo(bounds.left + radius, bounds.bottom);
+            path.cubicTo(bounds.left + radius / 2, bounds.bottom,
+                    bounds.left, bounds.bottom - radius / 2,
+                    bounds.left, bounds.bottom - radius);
+            path.lineTo(bounds.left, bounds.top + radius);
+            path.cubicTo(bounds.left, bounds.top + radius / 2,
+                    bounds.left + radius / 2, bounds.top,
+                    bounds.left + radius, bounds.top);
+            path.lineTo(bounds.right - caretWidth - radius, bounds.top);
+            path.cubicTo(bounds.right - caretWidth - radius / 2, bounds.top,
+                    bounds.right - caretWidth, bounds.top + radius / 2,
+                    bounds.right - caretWidth, bounds.top + radius);
+            path.lineTo(bounds.right - caretWidth, bounds.bottom - caretHeight);
+            path.close();
+        }
+
+        @Override
+        public void setAlpha(int alpha) {
+            mBubblePaint.setAlpha(alpha);
+        }
+
+        @Override
+        public int getAlpha() {
+            return mBubblePaint.getAlpha();
+        }
+
+        @Override
+        public void setColorFilter(ColorFilter cf) {
+            mBubblePaint.setColorFilter(cf);
+        }
+
+        @Override
+        public int getOpacity() {
+            return PixelFormat.TRANSLUCENT;
+        }
+
+        private void setCornerRadius(float radius) {
+            mCornerRadius = radius;
+            updatePath();
+        }
+    }
+
+}
