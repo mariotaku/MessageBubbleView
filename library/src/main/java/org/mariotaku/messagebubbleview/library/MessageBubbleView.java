@@ -55,6 +55,18 @@ public class MessageBubbleView extends FrameLayout {
         a.recycle();
     }
 
+    public void setBubbleColorFilter(ColorFilter cf) {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        background.setColorFilter(cf);
+    }
+
+    public void clearBubbleColorFilter() {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        background.clearColorFilter();
+    }
+
     public void setBubbleColor(ColorStateList color) {
         final Drawable background = getBackground();
         if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
