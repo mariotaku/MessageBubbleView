@@ -43,6 +43,15 @@ public class MessageBubbleView extends FrameLayout {
         setCornerRadius(a.getDimensionPixelSize(R.styleable.MessageBubbleView_cornerRadius, 0));
         setBubbleColor(a.getColorStateList(R.styleable.MessageBubbleView_bubbleColor));
         setCaretPosition(a.getInt(R.styleable.MessageBubbleView_caretPosition, NONE));
+        if (a.hasValue(R.styleable.MessageBubbleView_caretWidth) && a.hasValue(R.styleable.MessageBubbleView_caretHeight)) {
+            setCaretSize(a.getDimensionPixelSize(R.styleable.MessageBubbleView_caretWidth, 0),
+                    a.getDimensionPixelSize(R.styleable.MessageBubbleView_caretHeight, 0));
+        } else {
+            final Resources resources = getResources();
+            final float w = resources.getDisplayMetrics().density * 12;
+            final float h = w * 0.75f;
+            setCaretSize(Math.round(w), Math.round(h));
+        }
         a.recycle();
     }
 
@@ -58,6 +67,12 @@ public class MessageBubbleView extends FrameLayout {
         ((BackgroundDrawable) background).setCaretPosition(position);
     }
 
+    public void setCaretSize(int width, int height) {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        ((BackgroundDrawable) background).setCaretSize(width, height);
+    }
+
     public void setCornerRadius(float radius) {
         final Drawable background = getBackground();
         if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
@@ -68,18 +83,15 @@ public class MessageBubbleView extends FrameLayout {
 
         private final Paint mBubblePaint;
         private final Path mBubblePath;
-        private final float mCaretWidth;
-        private final float mCaretHeight;
 
         private final RectF mTempRectF = new RectF();
 
+        private float mCaretWidth, mCaretHeight;
         private int mCaretPosition;
         private float mCornerRadius;
         private ColorStateList mColor;
 
         BackgroundDrawable(Resources resources) {
-            mCaretWidth = resources.getDisplayMetrics().density * 12;
-            mCaretHeight = mCaretWidth * 0.75f;
             mBubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mBubblePath = new Path();
         }
@@ -92,6 +104,13 @@ public class MessageBubbleView extends FrameLayout {
         private void setColor(ColorStateList color) {
             mColor = color;
             updateColor();
+        }
+
+        public void setCaretSize(int width, int height) {
+            mCaretWidth = width;
+            mCaretHeight = height;
+            updatePath();
+            updateViewPadding();
         }
 
         @Override

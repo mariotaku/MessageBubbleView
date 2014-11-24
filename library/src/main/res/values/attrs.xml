@@ -3,6 +3,8 @@
     <declare-styleable name="MessageBubbleView">
         <attr name="cornerRadius" format="dimension"/>
         <attr name="bubbleColor" format="color"/>
+        <attr name="caretWidth" format="dimension"/>
+        <attr name="caretHeight" format="dimension"/>
         <attr name="caretPosition"/>
     </declare-styleable>
     <attr name="caretPosition">
