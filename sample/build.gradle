@@ -20,5 +20,6 @@ android {
 }
 
 dependencies {
+    compile project (':library')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

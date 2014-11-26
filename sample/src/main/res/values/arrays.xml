@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="entries_caret_position">
+        <item>NONE</item>
+        <item>TOP_LEFT</item>
+        <item>TOP_RIGHT</item>
+        <item>BOTTOM_LEFT</item>
+        <item>BOTTOM_RIGHT</item>
+    </string-array>
+</resources>
