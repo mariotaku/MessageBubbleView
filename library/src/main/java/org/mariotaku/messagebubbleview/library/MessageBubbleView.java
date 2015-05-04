@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 /**
+ * Display Content like message bubble
  * Created by mariotaku on 14/11/24.
  */
 public class MessageBubbleView extends FrameLayout {
@@ -87,17 +88,15 @@ public class MessageBubbleView extends FrameLayout {
     }
 
     private static int resolveHardCodedPosition(int caretPosition, int layoutDirection) {
-        if (layoutDirection == LAYOUT_DIRECTION_RTL) {
-            switch (caretPosition) {
-                case TOP_START:
-                    return TOP_RIGHT;
-                case TOP_END:
-                    return TOP_LEFT;
-                case BOTTOM_START:
-                    return BOTTOM_RIGHT;
-                case BOTTOM_END:
-                    return BOTTOM_LEFT;
-            }
+        switch (caretPosition) {
+            case TOP_START:
+                return layoutDirection == LAYOUT_DIRECTION_RTL ? TOP_RIGHT : TOP_LEFT;
+            case TOP_END:
+                return layoutDirection == LAYOUT_DIRECTION_RTL ? TOP_LEFT : TOP_RIGHT;
+            case BOTTOM_START:
+                return layoutDirection == LAYOUT_DIRECTION_RTL ? BOTTOM_RIGHT : BOTTOM_LEFT;
+            case BOTTOM_END:
+                return layoutDirection == LAYOUT_DIRECTION_RTL ? BOTTOM_LEFT : BOTTOM_RIGHT;
         }
         return caretPosition;
     }
