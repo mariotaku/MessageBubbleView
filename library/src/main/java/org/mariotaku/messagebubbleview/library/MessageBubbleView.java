@@ -13,6 +13,7 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -27,6 +28,10 @@ public class MessageBubbleView extends FrameLayout {
     public static final int TOP_RIGHT = 0x2;
     public static final int BOTTOM_LEFT = 0x3;
     public static final int BOTTOM_RIGHT = 0x4;
+    public static final int TOP_START = 0x11;
+    public static final int TOP_END = 0x12;
+    public static final int BOTTOM_START = 0x13;
+    public static final int BOTTOM_END = 0x14;
 
     public MessageBubbleView(Context context) {
         this(context, null);
@@ -38,6 +43,7 @@ public class MessageBubbleView extends FrameLayout {
 
     public MessageBubbleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        //noinspection deprecation
         setBackgroundDrawable(new BackgroundDrawable(getResources()));
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MessageBubbleView);
         setCornerRadius(a.getDimensionPixelSize(R.styleable.MessageBubbleView_cornerRadius, 0));
@@ -76,7 +82,24 @@ public class MessageBubbleView extends FrameLayout {
     public void setCaretPosition(int position) {
         final Drawable background = getBackground();
         if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        ((BackgroundDrawable) background).setCaretPosition(position);
+        final int rawPosition = resolveHardCodedPosition(position, ViewCompat.getLayoutDirection(this));
+        ((BackgroundDrawable) background).setCaretPosition(rawPosition);
+    }
+
+    private static int resolveHardCodedPosition(int caretPosition, int layoutDirection) {
+        if (layoutDirection == LAYOUT_DIRECTION_RTL) {
+            switch (caretPosition) {
+                case TOP_START:
+                    return TOP_RIGHT;
+                case TOP_END:
+                    return TOP_LEFT;
+                case BOTTOM_START:
+                    return BOTTOM_RIGHT;
+                case BOTTOM_END:
+                    return BOTTOM_LEFT;
+            }
+        }
+        return caretPosition;
     }
 
     public void setCaretSize(int width, int height) {

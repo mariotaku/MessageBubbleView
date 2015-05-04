@@ -6,5 +6,9 @@
         <item>TOP_RIGHT</item>
         <item>BOTTOM_LEFT</item>
         <item>BOTTOM_RIGHT</item>
+        <item>TOP_START</item>
+        <item>TOP_END</item>
+        <item>BOTTOM_START</item>
+        <item>BOTTOM_END</item>
     </string-array>
 </resources>

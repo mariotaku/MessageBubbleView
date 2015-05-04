@@ -14,6 +14,11 @@ import org.mariotaku.messagebubbleview.library.MessageBubbleView;
 
 public class MainActivity extends Activity implements OnItemSelectedListener, OnSeekBarChangeListener {
 
+    private static final int[] POSITIONS = {MessageBubbleView.NONE, MessageBubbleView.TOP_LEFT,
+            MessageBubbleView.TOP_RIGHT, MessageBubbleView.BOTTOM_LEFT, MessageBubbleView.BOTTOM_RIGHT,
+            MessageBubbleView.TOP_START, MessageBubbleView.TOP_END, MessageBubbleView.BOTTOM_START,
+            MessageBubbleView.BOTTOM_END};
+
     private MessageBubbleView bubble;
     private SeekBar seekBar;
     private Spinner spinner;
@@ -37,7 +42,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener, On
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        bubble.setCaretPosition(position);
+        bubble.setCaretPosition(POSITIONS[position]);
     }
 
     @Override
