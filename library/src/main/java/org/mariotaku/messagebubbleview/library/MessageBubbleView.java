@@ -381,7 +381,10 @@ public class MessageBubbleView extends FrameLayout {
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void getOutline(@NonNull Outline outline) {
-            if (!mOutlineEnabled || mCaretPosition != NONE) return;
+            if (!mOutlineEnabled || mCaretPosition != NONE) {
+                outline.setRect(getBounds());
+                return;
+            }
             outline.setRoundRect(getBounds(), mCornerRadius);
         }
 
