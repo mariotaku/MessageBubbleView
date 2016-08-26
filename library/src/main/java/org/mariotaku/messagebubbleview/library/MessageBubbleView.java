@@ -68,6 +68,12 @@ public class MessageBubbleView extends FrameLayout {
         background.setColorFilter(cf);
     }
 
+    public ColorFilter getBubbleColorFilter() {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        return ((BackgroundDrawable) background).getPaintColorFilter();
+    }
+
     public void clearBubbleColorFilter() {
         final Drawable background = getBackground();
         if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
@@ -78,6 +84,12 @@ public class MessageBubbleView extends FrameLayout {
         final Drawable background = getBackground();
         if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
         ((BackgroundDrawable) background).setColor(color);
+    }
+
+    public ColorStateList getBubbleColor() {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        return ((BackgroundDrawable) background).getColor();
     }
 
     public void setCaretPosition(int position) {
@@ -143,6 +155,10 @@ public class MessageBubbleView extends FrameLayout {
         private void setColor(ColorStateList color) {
             mColor = color;
             updateColor();
+        }
+
+        private ColorStateList getColor() {
+            return mColor;
         }
 
         public void setCaretSize(int width, int height) {
@@ -327,6 +343,15 @@ public class MessageBubbleView extends FrameLayout {
         @Override
         public void setColorFilter(ColorFilter cf) {
             mBubblePaint.setColorFilter(cf);
+        }
+
+        @Override
+        public ColorFilter getColorFilter() {
+            return getPaintColorFilter();
+        }
+
+        private ColorFilter getPaintColorFilter() {
+            return mBubblePaint.getColorFilter();
         }
 
         @Override
