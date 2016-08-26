@@ -1,11 +1,13 @@
 package org.mariotaku.messagebubbleview.library;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Path.Direction;
@@ -13,6 +15,8 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -125,6 +129,24 @@ public class MessageBubbleView extends FrameLayout {
         ((BackgroundDrawable) background).setCornerRadius(radius);
     }
 
+    public float getCornerRadius(float radius) {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        return ((BackgroundDrawable) background).getCornerRadius();
+    }
+
+    public void setOutlineEnabled(boolean enabled) {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        ((BackgroundDrawable) background).setOutlineEnabled(enabled);
+    }
+
+    public boolean isOutlineEnabled() {
+        final Drawable background = getBackground();
+        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        return ((BackgroundDrawable) background).isOutlineEnabled();
+    }
+
     private static class BackgroundDrawable extends Drawable {
 
         /**
@@ -141,6 +163,7 @@ public class MessageBubbleView extends FrameLayout {
         private int mCaretPosition;
         private float mCornerRadius;
         private ColorStateList mColor;
+        private boolean outlineEnabled;
 
         BackgroundDrawable(Resources resources) {
             mBubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -346,22 +369,42 @@ public class MessageBubbleView extends FrameLayout {
         }
 
         @Override
+        public int getOpacity() {
+            return PixelFormat.TRANSLUCENT;
+        }
+
+        @Override
         public ColorFilter getColorFilter() {
             return getPaintColorFilter();
+        }
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public void getOutline(@NonNull Outline outline) {
+            if (!outlineEnabled || !mBubblePath.isConvex()) return;
+            outline.setConvexPath(mBubblePath);
         }
 
         private ColorFilter getPaintColorFilter() {
             return mBubblePaint.getColorFilter();
         }
 
-        @Override
-        public int getOpacity() {
-            return PixelFormat.TRANSLUCENT;
-        }
-
         private void setCornerRadius(float radius) {
             mCornerRadius = radius;
             updatePath();
+        }
+
+        private float getCornerRadius() {
+            return mCornerRadius;
+        }
+
+        public void setOutlineEnabled(boolean outlineEnabled) {
+            this.outlineEnabled = outlineEnabled;
+            invalidateSelf();
+        }
+
+        public boolean isOutlineEnabled() {
+            return outlineEnabled;
         }
     }
 
