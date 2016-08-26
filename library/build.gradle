@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 
 android {
     compileSdkVersion 24
@@ -7,12 +8,27 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 24
-        versionCode 5
-        versionName "1.4"
+        versionCode 6
+        versionName "1.5"
     }
 }
 
 dependencies {
     compile 'com.android.support:support-compat:24.2.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+uploadArchives {
+    repositories {
+        mavenInstaller {
+            pom.version = android.defaultConfig.versionName
+            pom.groupId = 'com.github.mariotaku'
+            pom.artifactId = rootProject.name
+        }
+    }
 }

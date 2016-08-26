@@ -163,7 +163,7 @@ public class MessageBubbleView extends FrameLayout {
         private int mCaretPosition;
         private float mCornerRadius;
         private ColorStateList mColor;
-        private boolean outlineEnabled;
+        private boolean mOutlineEnabled;
 
         BackgroundDrawable(Resources resources) {
             mBubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -381,8 +381,8 @@ public class MessageBubbleView extends FrameLayout {
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void getOutline(@NonNull Outline outline) {
-            if (!outlineEnabled || !mBubblePath.isConvex()) return;
-            outline.setConvexPath(mBubblePath);
+            if (!mOutlineEnabled || mCaretPosition != NONE) return;
+            outline.setRoundRect(getBounds(), mCornerRadius);
         }
 
         private ColorFilter getPaintColorFilter() {
@@ -399,12 +399,12 @@ public class MessageBubbleView extends FrameLayout {
         }
 
         public void setOutlineEnabled(boolean outlineEnabled) {
-            this.outlineEnabled = outlineEnabled;
+            this.mOutlineEnabled = outlineEnabled;
             invalidateSelf();
         }
 
         public boolean isOutlineEnabled() {
-            return outlineEnabled;
+            return mOutlineEnabled;
         }
     }
 
