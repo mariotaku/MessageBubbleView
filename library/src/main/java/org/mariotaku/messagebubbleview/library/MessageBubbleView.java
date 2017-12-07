@@ -104,10 +104,11 @@ public class MessageBubbleView extends RelativeLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         ViewGroup.LayoutParams lp = getLayoutParams();
-        if (lp.width == ViewGroup.LayoutParams.WRAP_CONTENT && mWrapContentMaxWidthPercent > 0) {
-            int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        if (lp.width == ViewGroup.LayoutParams.WRAP_CONTENT
+                && MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.AT_MOST
+                && mWrapContentMaxWidthPercent > 0) {
             int width = (int) Math.max(getSuggestedMinimumWidth(), MeasureSpec.getSize(widthMeasureSpec) * mWrapContentMaxWidthPercent);
-            widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, widthMode);
+            widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.AT_MOST);
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }

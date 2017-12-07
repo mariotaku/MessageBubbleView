@@ -91,6 +91,7 @@ public class MainActivity extends Activity {
         });
         spinner.setSelection(indexOf(POSITIONS, bubble.getCaretPosition()));
         seekBar.setProgress((int) bubble.getCornerRadius());
+        widthSeekBar.setProgress((int) (bubble.getWrapContentMaxWidthPercent() * widthSeekBar.getMax()));
     }
 
     private int indexOf(int[] array, int value) {

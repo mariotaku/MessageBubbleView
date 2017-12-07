@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -25,7 +25,8 @@
             android:minWidth="48dp"
             app:bubbleColor="@color/color_messsage_bubble"
             app:caretPosition="topLeft"
-            app:cornerRadius="4dp">
+            app:cornerRadius="4dp"
+            app:wrapContentMaxWidthPercent="70%p">
 
             <TextView
                 android:id="@+id/text"
@@ -42,6 +43,7 @@
             android:id="@+id/spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/bubble"
             android:layout_marginTop="16dp"
             android:entries="@array/entries_caret_position"/>
 
@@ -49,6 +51,7 @@
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/spinner"
             android:layout_marginTop="16dp"
             android:max="192"/>
 
@@ -56,9 +59,10 @@
             android:id="@+id/width_seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/seek_bar"
             android:layout_marginTop="16dp"
             android:max="100"
             android:progress="100"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 </ScrollView>
