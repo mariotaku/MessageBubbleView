@@ -1,5 +1,6 @@
 package org.mariotaku.messagebubbleview.library;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -16,11 +17,22 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.Dimension;
+import android.support.annotation.FloatRange;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.Px;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Display Content like message bubble
@@ -28,15 +40,38 @@ import android.widget.FrameLayout;
  */
 public class MessageBubbleView extends FrameLayout {
 
-    public static final int NONE = 0x0;
-    public static final int TOP_LEFT = 0x1;
-    public static final int TOP_RIGHT = 0x2;
-    public static final int BOTTOM_LEFT = 0x3;
-    public static final int BOTTOM_RIGHT = 0x4;
-    public static final int TOP_START = 0x11;
-    public static final int TOP_END = 0x12;
-    public static final int BOTTOM_START = 0x13;
-    public static final int BOTTOM_END = 0x14;
+    public static final int NONE = Gravity.NO_GRAVITY;
+    public static final int TOP = Gravity.TOP;
+    public static final int BOTTOM = Gravity.BOTTOM;
+    @SuppressLint("RtlHardcoded")
+    public static final int LEFT = Gravity.LEFT;
+    @SuppressLint("RtlHardcoded")
+    public static final int RIGHT = Gravity.RIGHT;
+    public static final int START = Gravity.START;
+    public static final int END = Gravity.END;
+
+    @Deprecated
+    @SuppressLint("RtlHardcoded")
+    public static final int TOP_LEFT = Gravity.TOP | Gravity.LEFT;
+    @Deprecated
+    @SuppressLint("RtlHardcoded")
+    public static final int TOP_RIGHT = Gravity.TOP | Gravity.RIGHT;
+    @Deprecated
+    @SuppressLint("RtlHardcoded")
+    public static final int BOTTOM_LEFT = Gravity.BOTTOM | Gravity.LEFT;
+    @Deprecated
+    @SuppressLint("RtlHardcoded")
+    public static final int BOTTOM_RIGHT = Gravity.BOTTOM | Gravity.RIGHT;
+    @Deprecated
+    public static final int TOP_START = Gravity.TOP | Gravity.START;
+    @Deprecated
+    public static final int TOP_END = Gravity.TOP | Gravity.END;
+    @Deprecated
+    public static final int BOTTOM_START = Gravity.BOTTOM | Gravity.START;
+    @Deprecated
+    public static final int BOTTOM_END = Gravity.BOTTOM | Gravity.END;
+
+    private float mWrapContentMaxWidthPercent;
 
     public MessageBubbleView(Context context) {
         this(context, null);
@@ -54,6 +89,7 @@ public class MessageBubbleView extends FrameLayout {
         setCornerRadius(a.getDimensionPixelSize(R.styleable.MessageBubbleView_cornerRadius, 0));
         setBubbleColor(a.getColorStateList(R.styleable.MessageBubbleView_bubbleColor));
         setCaretPosition(a.getInt(R.styleable.MessageBubbleView_caretPosition, NONE));
+        setWrapContentMaxWidthPercent(a.getFraction(R.styleable.MessageBubbleView_wrapContentMaxWidthPercent, 1, 1, 0));
         if (a.hasValue(R.styleable.MessageBubbleView_caretWidth) && a.hasValue(R.styleable.MessageBubbleView_caretHeight)) {
             setCaretSize(a.getDimensionPixelSize(R.styleable.MessageBubbleView_caretWidth, 0),
                     a.getDimensionPixelSize(R.styleable.MessageBubbleView_caretHeight, 0));
@@ -66,85 +102,121 @@ public class MessageBubbleView extends FrameLayout {
         a.recycle();
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        ViewGroup.LayoutParams lp = getLayoutParams();
+        if (lp.width == ViewGroup.LayoutParams.WRAP_CONTENT && mWrapContentMaxWidthPercent > 0) {
+            int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+            int width = (int) (MeasureSpec.getSize(widthMeasureSpec) * mWrapContentMaxWidthPercent);
+            widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, widthMode);
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @SuppressWarnings("unused")
     public void setBubbleColorFilter(ColorFilter cf) {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        final BackgroundDrawable background = getBackgroundDrawable();
         background.setColorFilter(cf);
     }
 
+    @SuppressWarnings("unused")
     public ColorFilter getBubbleColorFilter() {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        return ((BackgroundDrawable) background).getPaintColorFilter();
+        final BackgroundDrawable background = getBackgroundDrawable();
+        return background.getPaintColorFilter();
     }
 
+    @SuppressWarnings("unused")
     public void clearBubbleColorFilter() {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
+        final BackgroundDrawable background = getBackgroundDrawable();
         background.clearColorFilter();
     }
 
-    public void setBubbleColor(ColorStateList color) {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        ((BackgroundDrawable) background).setColor(color);
+    @SuppressWarnings("unused")
+    public void setBubbleColor(@Nullable ColorStateList color) {
+        final BackgroundDrawable background = getBackgroundDrawable();
+        background.setColor(color);
     }
 
+    @Nullable
+    @SuppressWarnings("unused")
     public ColorStateList getBubbleColor() {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        return ((BackgroundDrawable) background).getColor();
+        final BackgroundDrawable background = getBackgroundDrawable();
+        return background.getColor();
     }
 
-    public void setCaretPosition(int position) {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        final int rawPosition = resolveHardCodedPosition(position, ViewCompat.getLayoutDirection(this));
-        ((BackgroundDrawable) background).setCaretPosition(rawPosition);
+    @CaretPosition
+    @SuppressWarnings("unused")
+    public int getCaretPosition() {
+        final BackgroundDrawable background = getBackgroundDrawable();
+        return background.getCaretPosition();
     }
 
-    private static int resolveHardCodedPosition(int caretPosition, int layoutDirection) {
-        switch (caretPosition) {
-            case TOP_START:
-                return layoutDirection == LAYOUT_DIRECTION_RTL ? TOP_RIGHT : TOP_LEFT;
-            case TOP_END:
-                return layoutDirection == LAYOUT_DIRECTION_RTL ? TOP_LEFT : TOP_RIGHT;
-            case BOTTOM_START:
-                return layoutDirection == LAYOUT_DIRECTION_RTL ? BOTTOM_RIGHT : BOTTOM_LEFT;
-            case BOTTOM_END:
-                return layoutDirection == LAYOUT_DIRECTION_RTL ? BOTTOM_LEFT : BOTTOM_RIGHT;
+    @SuppressWarnings("unused")
+    public void setCaretPosition(@CaretPosition int position) {
+        if (position != NONE && !Gravity.isHorizontal(position)) {
+            throw new IllegalArgumentException("Horizontal position mask not present");
         }
-        return caretPosition;
+        if (position != NONE && !Gravity.isVertical(position)) {
+            throw new IllegalArgumentException("Vertical position mask not present");
+        }
+        final BackgroundDrawable background = getBackgroundDrawable();
+        final int absPosition = GravityCompat.getAbsoluteGravity(position, ViewCompat.getLayoutDirection(this));
+        background.setCaretPosition(position, absPosition);
     }
 
-    public void setCaretSize(int width, int height) {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        ((BackgroundDrawable) background).setCaretSize(width, height);
+    @SuppressWarnings("unused")
+    public void setCaretSize(@Px int width, @Px int height) {
+        final BackgroundDrawable background = getBackgroundDrawable();
+        background.setCaretSize(width, height);
     }
 
-    public void setCornerRadius(float radius) {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        ((BackgroundDrawable) background).setCornerRadius(radius);
+    @SuppressWarnings("unused")
+    public void setCornerRadius(@Dimension float radius) {
+        final BackgroundDrawable background = getBackgroundDrawable();
+        background.setCornerRadius(radius);
     }
 
-    public float getCornerRadius(float radius) {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        return ((BackgroundDrawable) background).getCornerRadius();
+    @Dimension
+    @SuppressWarnings("unused")
+    public float getCornerRadius() {
+        final BackgroundDrawable background = getBackgroundDrawable();
+        return background.getCornerRadius();
     }
 
+    @SuppressWarnings("unused")
     public void setOutlineEnabled(boolean enabled) {
-        final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        ((BackgroundDrawable) background).setOutlineEnabled(enabled);
+        final BackgroundDrawable background = getBackgroundDrawable();
+        background.setOutlineEnabled(enabled);
     }
 
+    @SuppressWarnings("unused")
     public boolean isOutlineEnabled() {
+        final BackgroundDrawable background = getBackgroundDrawable();
+        return background.isOutlineEnabled();
+    }
+
+    public void setWrapContentMaxWidthPercent(@FloatRange(from = 0, to = 1) float percent) {
+        mWrapContentMaxWidthPercent = percent;
+        requestLayout();
+    }
+
+    public float getWrapContentMaxWidthPercent() {
+        return mWrapContentMaxWidthPercent;
+    }
+
+    @NonNull
+    private BackgroundDrawable getBackgroundDrawable() {
         final Drawable background = getBackground();
-        if (!(background instanceof BackgroundDrawable)) throw new IllegalArgumentException();
-        return ((BackgroundDrawable) background).isOutlineEnabled();
+        if (!(background instanceof BackgroundDrawable)) {
+            throw new IllegalArgumentException("You can't set custom background for MessageBubbleView");
+        }
+        return (BackgroundDrawable) background;
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(value = {NONE, TOP, BOTTOM, LEFT, RIGHT, START, END}, flag = true)
+    @interface CaretPosition {
+
     }
 
     private static class BackgroundDrawable extends Drawable {
@@ -160,7 +232,7 @@ public class MessageBubbleView extends FrameLayout {
         private final RectF mTempRectF = new RectF();
 
         private float mCaretWidth, mCaretHeight;
-        private int mCaretPosition;
+        private int mCaretPosition, mAbsoluteCaretPosition;
         private float mCornerRadius;
         private ColorStateList mColor;
         private boolean mOutlineEnabled;
@@ -171,24 +243,8 @@ public class MessageBubbleView extends FrameLayout {
         }
 
         @Override
-        public void draw(Canvas canvas) {
+        public void draw(@NonNull Canvas canvas) {
             canvas.drawPath(mBubblePath, mBubblePaint);
-        }
-
-        private void setColor(ColorStateList color) {
-            mColor = color;
-            updateColor();
-        }
-
-        private ColorStateList getColor() {
-            return mColor;
-        }
-
-        public void setCaretSize(int width, int height) {
-            mCaretWidth = width;
-            mCaretHeight = height;
-            updatePath();
-            updateViewPadding();
         }
 
         @Override
@@ -202,19 +258,6 @@ public class MessageBubbleView extends FrameLayout {
             return true;
         }
 
-        private void updateColor() {
-            if (mColor == null) return;
-            final int color = mColor.getColorForState(getState(), mColor.getDefaultColor());
-            mBubblePaint.setColor(color);
-            invalidateSelf();
-        }
-
-        private void setCaretPosition(int position) {
-            mCaretPosition = position;
-            updatePath();
-            updateViewPadding();
-        }
-
         @Override
         protected void onBoundsChange(Rect bounds) {
             super.onBoundsChange(bounds);
@@ -222,17 +265,109 @@ public class MessageBubbleView extends FrameLayout {
             updateViewPadding();
         }
 
+        @Override
+        public void setAlpha(int alpha) {
+            mBubblePaint.setAlpha(alpha);
+        }
+
+        @Override
+        public int getAlpha() {
+            return mBubblePaint.getAlpha();
+        }
+
+        @Override
+        public void setColorFilter(ColorFilter cf) {
+            mBubblePaint.setColorFilter(cf);
+        }
+
+        @Override
+        public int getOpacity() {
+            return PixelFormat.TRANSLUCENT;
+        }
+
+        @Override
+        public ColorFilter getColorFilter() {
+            return getPaintColorFilter();
+        }
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public void getOutline(@NonNull Outline outline) {
+            if (!mOutlineEnabled || mCaretPosition != NONE) {
+                outline.setRect(getBounds());
+                return;
+            }
+            outline.setRoundRect(getBounds(), mCornerRadius);
+        }
+
+        @Nullable
+        ColorStateList getColor() {
+            return mColor;
+        }
+
+        void setColor(@Nullable ColorStateList color) {
+            mColor = color;
+            updateColor();
+        }
+
+        void setCaretSize(int width, int height) {
+            mCaretWidth = width;
+            mCaretHeight = height;
+            updatePath();
+            updateViewPadding();
+        }
+
+        void setCaretPosition(int position, int absolute) {
+            mCaretPosition = position;
+            mAbsoluteCaretPosition = absolute;
+            updatePath();
+            updateViewPadding();
+        }
+
+        int getCaretPosition() {
+            return mCaretPosition;
+        }
+
+        ColorFilter getPaintColorFilter() {
+            return mBubblePaint.getColorFilter();
+        }
+
+        void setCornerRadius(float radius) {
+            mCornerRadius = radius;
+            updatePath();
+        }
+
+        float getCornerRadius() {
+            return mCornerRadius;
+        }
+
+        void setOutlineEnabled(boolean outlineEnabled) {
+            this.mOutlineEnabled = outlineEnabled;
+            invalidateSelf();
+        }
+
+        boolean isOutlineEnabled() {
+            return mOutlineEnabled;
+        }
+
+        private void updateColor() {
+            if (mColor == null) return;
+            final int color = mColor.getColorForState(getState(), mColor.getDefaultColor());
+            mBubblePaint.setColor(color);
+            invalidateSelf();
+        }
+
         private void updateViewPadding() {
             final Callback callback = getCallback();
             if (!(callback instanceof View)) return;
             final View view = (View) callback;
-            switch (mCaretPosition) {
-                case TOP_LEFT:
-                case BOTTOM_LEFT:
+            switch (mAbsoluteCaretPosition) {
+                case TOP | LEFT:
+                case BOTTOM | LEFT:
                     view.setPadding(Math.round(mCaretWidth), 0, 0, 0);
                     break;
-                case TOP_RIGHT:
-                case BOTTOM_RIGHT:
+                case TOP | RIGHT:
+                case BOTTOM | RIGHT:
                     view.setPadding(0, 0, Math.round(mCaretWidth), 0);
                     break;
                 default:
@@ -246,20 +381,20 @@ public class MessageBubbleView extends FrameLayout {
             final float radius = mCornerRadius;
             final float caretWidth = mCaretWidth, caretHeight = mCaretHeight;
             mBubblePath.reset();
-            switch (mCaretPosition) {
-                case TOP_LEFT: {
+            switch (mAbsoluteCaretPosition) {
+                case TOP | LEFT: {
                     updateTopLeftBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
                 }
-                case TOP_RIGHT: {
+                case TOP | RIGHT: {
                     updateTopRightBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
                 }
-                case BOTTOM_LEFT: {
+                case BOTTOM | LEFT: {
                     updateBottomLeftBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
                 }
-                case BOTTOM_RIGHT: {
+                case BOTTOM | RIGHT: {
                     updateBottomRightBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
                 }
@@ -351,63 +486,6 @@ public class MessageBubbleView extends FrameLayout {
                     bounds.right - caretWidth, bounds.top + radius);
             path.lineTo(bounds.right - caretWidth, bounds.bottom - caretHeight);
             path.close();
-        }
-
-        @Override
-        public void setAlpha(int alpha) {
-            mBubblePaint.setAlpha(alpha);
-        }
-
-        @Override
-        public int getAlpha() {
-            return mBubblePaint.getAlpha();
-        }
-
-        @Override
-        public void setColorFilter(ColorFilter cf) {
-            mBubblePaint.setColorFilter(cf);
-        }
-
-        @Override
-        public int getOpacity() {
-            return PixelFormat.TRANSLUCENT;
-        }
-
-        @Override
-        public ColorFilter getColorFilter() {
-            return getPaintColorFilter();
-        }
-
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-        @Override
-        public void getOutline(@NonNull Outline outline) {
-            if (!mOutlineEnabled || mCaretPosition != NONE) {
-                outline.setRect(getBounds());
-                return;
-            }
-            outline.setRoundRect(getBounds(), mCornerRadius);
-        }
-
-        private ColorFilter getPaintColorFilter() {
-            return mBubblePaint.getColorFilter();
-        }
-
-        private void setCornerRadius(float radius) {
-            mCornerRadius = radius;
-            updatePath();
-        }
-
-        private float getCornerRadius() {
-            return mCornerRadius;
-        }
-
-        public void setOutlineEnabled(boolean outlineEnabled) {
-            this.mOutlineEnabled = outlineEnabled;
-            invalidateSelf();
-        }
-
-        public boolean isOutlineEnabled() {
-            return mOutlineEnabled;
         }
     }
 

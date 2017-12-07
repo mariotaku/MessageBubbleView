@@ -18,28 +18,30 @@
 
         <org.mariotaku.messagebubbleview.library.MessageBubbleView
             android:id="@+id/bubble"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
             app:bubbleColor="@color/color_messsage_bubble"
             app:caretPosition="topLeft"
-            app:cornerRadius="4dp">
+            app:cornerRadius="4dp"
+            app:wrapContentMaxWidthPercent="50%p">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:minHeight="240dp"
-                android:text="Hello world"/>
+                android:text="Hello world aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"/>
 
 
         </org.mariotaku.messagebubbleview.library.MessageBubbleView>
 
         <Spinner
             android:id="@+id/spinner"
-            android:entries="@array/entries_caret_position"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:entries="@array/entries_caret_position"/>
+
         <SeekBar
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"

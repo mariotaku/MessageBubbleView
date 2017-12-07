@@ -2,25 +2,20 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.1"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 24
+        targetSdkVersion 27
         versionCode 7
         versionName "1.6"
     }
 }
 
 dependencies {
-    compile 'com.android.support:support-compat:24.2.0'
+    compile 'com.android.support:support-compat:27.0.2'
     compile fileTree(dir: 'libs', include: ['*.jar'])
-}
-
-repositories {
-    mavenLocal()
-    jcenter()
 }
 
 uploadArchives {

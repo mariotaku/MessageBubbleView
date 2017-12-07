@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="MessageBubbleView">
-        <attr name="cornerRadius" format="dimension" />
-        <attr name="bubbleColor" format="color" />
-        <attr name="caretWidth" format="dimension" />
-        <attr name="caretHeight" format="dimension" />
-        <attr name="caretPosition" />
+        <attr name="cornerRadius" format="dimension"/>
+        <attr name="bubbleColor" format="color"/>
+        <attr name="caretWidth" format="dimension"/>
+        <attr name="caretHeight" format="dimension"/>
+        <attr name="caretPosition"/>
+        <attr name="wrapContentMaxWidthPercent" format="fraction"/>
     </declare-styleable>
     <attr name="caretPosition">
-        <enum name="none" value="0x0" />
-        <enum name="topLeft" value="0x1" />
-        <enum name="topRight" value="0x2" />
-        <enum name="bottomLeft" value="0x3" />
-        <enum name="bottomRight" value="0x4" />
-        <enum name="topStart" value="0x11" />
-        <enum name="topEnd" value="0x12" />
-        <enum name="bottomStart" value="0x13" />
-        <enum name="bottomEnd" value="0x14" />
+        <flag name="none" value="0x0"/>
+        <flag name="top" value="0x30"/>
+        <flag name="bottom" value="0x50"/>
+        <flag name="left" value="0x03"/>
+        <flag name="right" value="0x05"/>
+        <flag name="start" value="0x00800003"/>
+        <flag name="end" value="0x00800005"/>
+        <flag name="topLeft" value="0x33"/>
+        <flag name="topRight" value="0x35"/>
+        <flag name="bottomLeft" value="0x53"/>
+        <flag name="bottomRight" value="0x55"/>
+        <flag name="topStart" value="0x00800033"/>
+        <flag name="topEnd" value="0x00800035"/>
+        <flag name="bottomStart" value="0x00800053"/>
+        <flag name="bottomEnd" value="0x00800055"/>
     </attr>
 </resources>
