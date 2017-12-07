@@ -27,9 +27,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -38,7 +37,7 @@ import java.lang.annotation.RetentionPolicy;
  * Display Content like message bubble
  * Created by mariotaku on 14/11/24.
  */
-public class MessageBubbleView extends FrameLayout {
+public class MessageBubbleView extends RelativeLayout {
 
     public static final int NONE = Gravity.NO_GRAVITY;
     public static final int TOP = Gravity.TOP;
@@ -84,7 +83,7 @@ public class MessageBubbleView extends FrameLayout {
     public MessageBubbleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         //noinspection deprecation
-        setBackgroundDrawable(new BackgroundDrawable(getResources()));
+        setBackgroundDrawable(new BackgroundDrawable());
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MessageBubbleView);
         setCornerRadius(a.getDimensionPixelSize(R.styleable.MessageBubbleView_cornerRadius, 0));
         setBubbleColor(a.getColorStateList(R.styleable.MessageBubbleView_bubbleColor));
@@ -162,18 +161,21 @@ public class MessageBubbleView extends FrameLayout {
         final BackgroundDrawable background = getBackgroundDrawable();
         final int absPosition = GravityCompat.getAbsoluteGravity(position, ViewCompat.getLayoutDirection(this));
         background.setCaretPosition(position, absPosition);
+        resetBackground();
     }
 
     @SuppressWarnings("unused")
     public void setCaretSize(@Px int width, @Px int height) {
         final BackgroundDrawable background = getBackgroundDrawable();
         background.setCaretSize(width, height);
+        resetBackground();
     }
 
     @SuppressWarnings("unused")
     public void setCornerRadius(@Dimension float radius) {
         final BackgroundDrawable background = getBackgroundDrawable();
         background.setCornerRadius(radius);
+        resetBackground();
     }
 
     @Dimension
@@ -213,6 +215,12 @@ public class MessageBubbleView extends FrameLayout {
         return (BackgroundDrawable) background;
     }
 
+    private void resetBackground() {
+        BackgroundDrawable drawable = getBackgroundDrawable();
+        ViewCompat.setBackground(this, null);
+        ViewCompat.setBackground(this, drawable);
+    }
+
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(value = {NONE, TOP, BOTTOM, LEFT, RIGHT, START, END}, flag = true)
     @interface CaretPosition {
@@ -237,7 +245,7 @@ public class MessageBubbleView extends FrameLayout {
         private ColorStateList mColor;
         private boolean mOutlineEnabled;
 
-        BackgroundDrawable(Resources resources) {
+        BackgroundDrawable() {
             mBubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mBubblePath = new Path();
         }
@@ -262,7 +270,6 @@ public class MessageBubbleView extends FrameLayout {
         protected void onBoundsChange(Rect bounds) {
             super.onBoundsChange(bounds);
             updatePath();
-            updateViewPadding();
         }
 
         @Override
@@ -290,6 +297,24 @@ public class MessageBubbleView extends FrameLayout {
             return getPaintColorFilter();
         }
 
+        @Override
+        public boolean getPadding(@NonNull Rect padding) {
+            switch (mAbsoluteCaretPosition) {
+                case TOP | LEFT:
+                case BOTTOM | LEFT:
+                    padding.set(Math.round(mCaretWidth), 0, 0, 0);
+                    break;
+                case TOP | RIGHT:
+                case BOTTOM | RIGHT:
+                    padding.set(0, 0, Math.round(mCaretWidth), 0);
+                    break;
+                default:
+                    padding.set(0, 0, 0, 0);
+                    break;
+            }
+            return true;
+        }
+
         @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void getOutline(@NonNull Outline outline) {
@@ -314,14 +339,12 @@ public class MessageBubbleView extends FrameLayout {
             mCaretWidth = width;
             mCaretHeight = height;
             updatePath();
-            updateViewPadding();
         }
 
         void setCaretPosition(int position, int absolute) {
             mCaretPosition = position;
             mAbsoluteCaretPosition = absolute;
             updatePath();
-            updateViewPadding();
         }
 
         int getCaretPosition() {
@@ -355,25 +378,6 @@ public class MessageBubbleView extends FrameLayout {
             final int color = mColor.getColorForState(getState(), mColor.getDefaultColor());
             mBubblePaint.setColor(color);
             invalidateSelf();
-        }
-
-        private void updateViewPadding() {
-            final Callback callback = getCallback();
-            if (!(callback instanceof View)) return;
-            final View view = (View) callback;
-            switch (mAbsoluteCaretPosition) {
-                case TOP | LEFT:
-                case BOTTOM | LEFT:
-                    view.setPadding(Math.round(mCaretWidth), 0, 0, 0);
-                    break;
-                case TOP | RIGHT:
-                case BOTTOM | RIGHT:
-                    view.setPadding(0, 0, Math.round(mCaretWidth), 0);
-                    break;
-                default:
-                    view.setPadding(0, 0, 0, 0);
-                    break;
-            }
         }
 
         private void updatePath() {

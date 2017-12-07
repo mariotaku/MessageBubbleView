@@ -27,21 +27,15 @@
             app:caretPosition="topLeft"
             app:cornerRadius="4dp">
 
-            <RelativeLayout
+            <TextView
+                android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/mediaPreview"
-                android:padding="8dp">
+                android:layout_margin="8dp"
+                android:text="@string/sample_status_text"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="?android:attr/textColorPrimary"/>
 
-                <TextView
-                    android:id="@+id/text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/sample_status_text"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorPrimary"/>
-
-            </RelativeLayout>
         </org.mariotaku.messagebubbleview.library.MessageBubbleView>
 
         <Spinner
