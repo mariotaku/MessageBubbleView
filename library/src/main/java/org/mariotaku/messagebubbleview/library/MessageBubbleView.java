@@ -107,7 +107,7 @@ public class MessageBubbleView extends FrameLayout {
         ViewGroup.LayoutParams lp = getLayoutParams();
         if (lp.width == ViewGroup.LayoutParams.WRAP_CONTENT && mWrapContentMaxWidthPercent > 0) {
             int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-            int width = (int) (MeasureSpec.getSize(widthMeasureSpec) * mWrapContentMaxWidthPercent);
+            int width = (int) Math.max(getSuggestedMinimumWidth(), MeasureSpec.getSize(widthMeasureSpec) * mWrapContentMaxWidthPercent);
             widthMeasureSpec = MeasureSpec.makeMeasureSpec(width, widthMode);
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);

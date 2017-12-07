@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MessageBubbleView</string>
+    <string name="sample_status_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam faucibus quis purus ac malesuada. Duis id vulputate magna, a eleifend amet.</string>
 </resources>

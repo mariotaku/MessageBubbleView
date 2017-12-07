@@ -19,34 +19,52 @@
         <org.mariotaku.messagebubbleview.library.MessageBubbleView
             android:id="@+id/bubble"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:clickable="true"
+            android:minHeight="36dp"
+            android:minWidth="48dp"
             app:bubbleColor="@color/color_messsage_bubble"
             app:caretPosition="topLeft"
-            app:cornerRadius="4dp"
-            app:wrapContentMaxWidthPercent="50%p">
+            app:cornerRadius="4dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:minHeight="240dp"
-                android:text="Hello world aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"/>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/mediaPreview"
+                android:padding="8dp">
 
+                <TextView
+                    android:id="@+id/text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sample_status_text"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="?android:attr/textColorPrimary"/>
 
+            </RelativeLayout>
         </org.mariotaku.messagebubbleview.library.MessageBubbleView>
 
         <Spinner
             android:id="@+id/spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:entries="@array/entries_caret_position"/>
 
         <SeekBar
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:max="192"/>
+
+        <SeekBar
+            android:id="@+id/width_seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:max="100"
+            android:progress="100"/>
 
     </LinearLayout>
 </ScrollView>
