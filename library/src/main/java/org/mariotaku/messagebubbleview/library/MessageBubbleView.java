@@ -48,6 +48,7 @@ public class MessageBubbleView extends RelativeLayout {
     public static final int RIGHT = Gravity.RIGHT;
     public static final int START = Gravity.START;
     public static final int END = Gravity.END;
+    public static final int CENTER_HORIZONTAL = Gravity.CENTER_HORIZONTAL;
 
     @Deprecated
     @SuppressLint("RtlHardcoded")
@@ -309,6 +310,9 @@ public class MessageBubbleView extends RelativeLayout {
                 case BOTTOM | RIGHT:
                     padding.set(0, 0, Math.round(mCaretWidth), 0);
                     break;
+                case BOTTOM | CENTER_HORIZONTAL:
+                    padding.set(0, 0, 0, Math.round(mCaretWidth));
+                    break;
                 default:
                     padding.set(0, 0, 0, 0);
                     break;
@@ -403,6 +407,10 @@ public class MessageBubbleView extends RelativeLayout {
                     updateBottomRightBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
                 }
+                case BOTTOM | CENTER_HORIZONTAL: {
+                    updateBottomBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
+                    break;
+                }
                 default: {
                     updateRectBubble(mBubblePath, bounds, radius);
                     break;
@@ -490,6 +498,30 @@ public class MessageBubbleView extends RelativeLayout {
                     bounds.right - caretWidth, bounds.top + radius * CONTROL_POINT_RATIO,
                     bounds.right - caretWidth, bounds.top + radius);
             path.lineTo(bounds.right - caretWidth, bounds.bottom - caretHeight);
+            path.close();
+        }
+
+        private void updateBottomBubble(Path path, Rect bounds, float radius, float caretWidth,
+                                        float caretHeight) {
+            path.moveTo(bounds.centerX(), bounds.bottom);
+            path.lineTo(bounds.centerX() - caretWidth / 2, bounds.bottom - caretHeight);
+            path.lineTo(bounds.left + radius, bounds.bottom - caretHeight);
+            path.cubicTo(bounds.left + radius * CONTROL_POINT_RATIO, bounds.bottom - caretHeight,
+                    bounds.left, bounds.bottom - caretHeight - radius * CONTROL_POINT_RATIO,
+                    bounds.left, bounds.bottom - caretHeight - radius);
+            path.lineTo(bounds.left, bounds.top + radius);
+            path.cubicTo(bounds.left, bounds.top + radius * CONTROL_POINT_RATIO,
+                    bounds.left + radius * CONTROL_POINT_RATIO, bounds.top,
+                    bounds.left + radius, bounds.top);
+            path.lineTo(bounds.right - radius, bounds.top);
+            path.cubicTo(bounds.right - radius * CONTROL_POINT_RATIO, bounds.top,
+                    bounds.right, bounds.top + radius * CONTROL_POINT_RATIO,
+                    bounds.right, bounds.top + radius);
+            path.lineTo(bounds.right, bounds.bottom - caretHeight - radius);
+            path.cubicTo(bounds.right, bounds.bottom - caretHeight - radius * CONTROL_POINT_RATIO,
+                    bounds.right - radius * CONTROL_POINT_RATIO, bounds.bottom - caretHeight,
+                    bounds.right - radius, bounds.bottom - caretHeight);
+            path.lineTo(bounds.centerX() + caretWidth / 2, bounds.bottom - caretHeight);
             path.close();
         }
     }

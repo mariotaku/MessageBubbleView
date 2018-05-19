@@ -23,7 +23,8 @@ public class MainActivity extends Activity {
             MessageBubbleView.TOP | MessageBubbleView.START,
             MessageBubbleView.TOP | MessageBubbleView.END,
             MessageBubbleView.BOTTOM | MessageBubbleView.START,
-            MessageBubbleView.BOTTOM | MessageBubbleView.END
+            MessageBubbleView.BOTTOM | MessageBubbleView.END,
+            MessageBubbleView.BOTTOM | MessageBubbleView.CENTER_HORIZONTAL,
     };
 
     private MessageBubbleView bubble;
