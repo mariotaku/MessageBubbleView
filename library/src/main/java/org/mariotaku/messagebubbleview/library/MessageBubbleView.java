@@ -311,7 +311,7 @@ public class MessageBubbleView extends RelativeLayout {
                     padding.set(0, 0, Math.round(mCaretWidth), 0);
                     break;
                 case BOTTOM | CENTER_HORIZONTAL:
-                    padding.set(0, 0, 0, Math.round(mCaretWidth));
+                    padding.set(0, 0, 0, Math.round(mCaretHeight));
                     break;
                 default:
                     padding.set(0, 0, 0, 0);
