@@ -11,5 +11,6 @@
         <item>BOTTOM_START</item>
         <item>BOTTOM_END</item>
         <item>BOTTOM</item>
+        <item>TOP</item>
     </string-array>
 </resources>

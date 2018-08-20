@@ -8,8 +8,8 @@ android {
         applicationId "org.mariotaku.messagebubbleview"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 3
-        versionName "1.2"
+        versionCode 4
+        versionName "1.3"
     }
     buildTypes {
         release {

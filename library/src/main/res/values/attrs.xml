@@ -20,6 +20,7 @@
 
         <flag name="topLeft" value="0x33"/>
         <flag name="topRight" value="0x35"/>
+        <flag name="topCenter" value="0x31"/>
         <flag name="bottomLeft" value="0x53"/>
         <flag name="bottomRight" value="0x55"/>
         <flag name="bottomCenter" value="0x51"/>
