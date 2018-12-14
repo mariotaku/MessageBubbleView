@@ -17,14 +17,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.annotation.Dimension;
-import android.support.annotation.FloatRange;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.Px;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -32,6 +24,15 @@ import android.widget.RelativeLayout;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.Dimension;
+import androidx.annotation.FloatRange;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Px;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
 
 /**
  * Display Content like message bubble
@@ -48,7 +49,7 @@ public class MessageBubbleView extends RelativeLayout {
     public static final int RIGHT = Gravity.RIGHT;
     public static final int START = Gravity.START;
     public static final int END = Gravity.END;
-    public static final int CENTER_HORIZONTAL = Gravity.CENTER_HORIZONTAL;
+    public static final int VERTICAL = Gravity.CLIP_VERTICAL;
 
     @Deprecated
     @SuppressLint("RtlHardcoded")
@@ -154,12 +155,6 @@ public class MessageBubbleView extends RelativeLayout {
 
     @SuppressWarnings("unused")
     public void setCaretPosition(@CaretPosition int position) {
-        if (position != NONE && !Gravity.isHorizontal(position)) {
-            throw new IllegalArgumentException("Horizontal position mask not present");
-        }
-        if (position != NONE && !Gravity.isVertical(position)) {
-            throw new IllegalArgumentException("Vertical position mask not present");
-        }
         final BackgroundDrawable background = getBackgroundDrawable();
         final int absPosition = GravityCompat.getAbsoluteGravity(position, ViewCompat.getLayoutDirection(this));
         background.setCaretPosition(position, absPosition);
@@ -301,19 +296,23 @@ public class MessageBubbleView extends RelativeLayout {
 
         @Override
         public boolean getPadding(@NonNull Rect padding) {
-            switch (mAbsoluteCaretPosition) {
-                case TOP | LEFT:
-                case BOTTOM | LEFT:
+            int paddingGravity;
+            if ((mAbsoluteCaretPosition & VERTICAL) != 0) {
+                paddingGravity = mAbsoluteCaretPosition & Gravity.VERTICAL_GRAVITY_MASK;
+            } else {
+                paddingGravity = mAbsoluteCaretPosition & Gravity.HORIZONTAL_GRAVITY_MASK;
+            }
+            switch (paddingGravity) {
+                case LEFT:
                     padding.set(Math.round(mCaretWidth), 0, 0, 0);
                     break;
-                case TOP | RIGHT:
-                case BOTTOM | RIGHT:
+                case RIGHT:
                     padding.set(0, 0, Math.round(mCaretWidth), 0);
                     break;
-                case BOTTOM | CENTER_HORIZONTAL:
+                case BOTTOM:
                     padding.set(0, 0, 0, Math.round(mCaretHeight));
                     break;
-                case TOP | CENTER_HORIZONTAL:
+                case TOP:
                     padding.set(0, Math.round(mCaretHeight), 0, 0);
                     break;
                 default:
@@ -410,12 +409,20 @@ public class MessageBubbleView extends RelativeLayout {
                     updateBottomRightBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
                 }
-                case BOTTOM | CENTER_HORIZONTAL: {
+                case BOTTOM | VERTICAL: {
                     updateBottomBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
                 }
-                case TOP | CENTER_HORIZONTAL: {
+                case TOP | VERTICAL: {
                     updateTopBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
+                    break;
+                }
+                case TOP | LEFT | VERTICAL: {
+                    updateTopLeftVBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
+                    break;
+                }
+                case TOP | RIGHT | VERTICAL: {
+                    updateTopRightVBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
                 }
                 default: {
@@ -553,6 +560,46 @@ public class MessageBubbleView extends RelativeLayout {
                     bounds.right - radius * CONTROL_POINT_RATIO, bounds.top + caretHeight,
                     bounds.right - radius, bounds.top + caretHeight);
             path.lineTo(bounds.centerX() + caretWidth / 2, bounds.top + caretHeight);
+            path.close();
+        }
+
+        private void updateTopLeftVBubble(Path path, Rect bounds, float radius, float caretWidth,
+                                          float caretHeight) {
+            path.moveTo(bounds.left, bounds.top);
+            path.lineTo(bounds.left, bounds.bottom - radius);
+            path.cubicTo(bounds.left, bounds.bottom - radius * CONTROL_POINT_RATIO,
+                    bounds.left + radius * CONTROL_POINT_RATIO, bounds.bottom,
+                    bounds.left + radius, bounds.bottom);
+            path.lineTo(bounds.right - radius, bounds.bottom);
+            path.cubicTo(bounds.right - radius * CONTROL_POINT_RATIO, bounds.bottom,
+                    bounds.right, bounds.bottom - radius * CONTROL_POINT_RATIO,
+                    bounds.right, bounds.bottom - radius);
+            path.lineTo(bounds.right, bounds.top + caretHeight + radius);
+            path.cubicTo(bounds.right, bounds.top + caretHeight + radius * CONTROL_POINT_RATIO,
+                    bounds.right - radius * CONTROL_POINT_RATIO, bounds.top + caretHeight,
+                    bounds.right - radius, bounds.top + caretHeight);
+            path.lineTo(bounds.left + caretWidth, bounds.top + caretHeight);
+            path.lineTo(bounds.left, bounds.top);
+            path.close();
+        }
+
+        private void updateTopRightVBubble(Path path, Rect bounds, float radius, float caretWidth,
+                                           float caretHeight) {
+            path.moveTo(bounds.right, bounds.top);
+            path.lineTo(bounds.right - caretWidth, bounds.top + caretHeight);
+            path.lineTo(bounds.left + radius, bounds.top + caretHeight);
+            path.cubicTo(bounds.left + radius * CONTROL_POINT_RATIO, bounds.top + caretHeight,
+                    bounds.left, bounds.top + caretHeight + radius * CONTROL_POINT_RATIO,
+                    bounds.left, bounds.top + caretHeight + radius);
+            path.lineTo(bounds.left, bounds.bottom - radius);
+            path.cubicTo(bounds.left, bounds.bottom - radius * CONTROL_POINT_RATIO,
+                    bounds.left + radius * CONTROL_POINT_RATIO, bounds.bottom,
+                    bounds.left + radius, bounds.bottom);
+            path.lineTo(bounds.right - radius, bounds.bottom);
+            path.cubicTo(bounds.right - radius * CONTROL_POINT_RATIO, bounds.bottom,
+                    bounds.right, bounds.bottom - radius * CONTROL_POINT_RATIO,
+                    bounds.right, bounds.bottom - radius);
+            path.moveTo(bounds.right, bounds.top);
             path.close();
         }
     }

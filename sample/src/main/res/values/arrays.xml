@@ -12,5 +12,9 @@
         <item>BOTTOM_END</item>
         <item>BOTTOM</item>
         <item>TOP</item>
+        <item>TOP_LEFT|VERTICAL</item>
+        <item>TOP_RIGHT|VERTICAL</item>
+        <item>TOP_START|VERTICAL</item>
+        <item>TOP_END|VERTICAL</item>
     </string-array>
 </resources>

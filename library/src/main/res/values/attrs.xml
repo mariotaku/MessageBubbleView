@@ -16,14 +16,14 @@
         <flag name="right" value="0x05"/>
         <flag name="start" value="0x00800003"/>
         <flag name="end" value="0x00800005"/>
-        <flag name="centerHorizontal" value="0x01"/>
+        <flag name="vertical" value="0x80"/>
 
         <flag name="topLeft" value="0x33"/>
         <flag name="topRight" value="0x35"/>
-        <flag name="topCenter" value="0x31"/>
+        <flag name="topCenter" value="0xB0"/>
         <flag name="bottomLeft" value="0x53"/>
         <flag name="bottomRight" value="0x55"/>
-        <flag name="bottomCenter" value="0x51"/>
+        <flag name="bottomCenter" value="0xD0"/>
 
         <flag name="topStart" value="0x00800033"/>
         <flag name="topEnd" value="0x00800035"/>

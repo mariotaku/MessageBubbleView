@@ -24,8 +24,12 @@ public class MainActivity extends Activity {
             MessageBubbleView.TOP | MessageBubbleView.END,
             MessageBubbleView.BOTTOM | MessageBubbleView.START,
             MessageBubbleView.BOTTOM | MessageBubbleView.END,
-            MessageBubbleView.BOTTOM | MessageBubbleView.CENTER_HORIZONTAL,
-            MessageBubbleView.TOP | MessageBubbleView.CENTER_HORIZONTAL,
+            MessageBubbleView.BOTTOM | MessageBubbleView.VERTICAL,
+            MessageBubbleView.TOP | MessageBubbleView.VERTICAL,
+            MessageBubbleView.TOP | MessageBubbleView.LEFT | MessageBubbleView.VERTICAL,
+            MessageBubbleView.TOP | MessageBubbleView.RIGHT | MessageBubbleView.VERTICAL,
+            MessageBubbleView.TOP | MessageBubbleView.START | MessageBubbleView.VERTICAL,
+            MessageBubbleView.TOP | MessageBubbleView.END | MessageBubbleView.VERTICAL,
     };
 
     private MessageBubbleView bubble;
