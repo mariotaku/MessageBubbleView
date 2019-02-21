@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -18,6 +17,8 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -91,12 +92,25 @@ public class MessageBubbleView extends RelativeLayout {
         setBubbleColor(a.getColorStateList(R.styleable.MessageBubbleView_bubbleColor));
         setCaretPosition(a.getInt(R.styleable.MessageBubbleView_caretPosition, NONE));
         setWrapContentMaxWidthPercent(a.getFraction(R.styleable.MessageBubbleView_wrapContentMaxWidthPercent, 1, 1, 0));
+        DisplayMetrics dm = getResources().getDisplayMetrics();
         if (a.hasValue(R.styleable.MessageBubbleView_caretWidth) && a.hasValue(R.styleable.MessageBubbleView_caretHeight)) {
-            setCaretSize(a.getDimensionPixelSize(R.styleable.MessageBubbleView_caretWidth, 0),
-                    a.getDimensionPixelSize(R.styleable.MessageBubbleView_caretHeight, 0));
+            int caretWidth, caretHeight;
+            TypedValue tv = new TypedValue();
+            a.getValue(R.styleable.MessageBubbleView_caretWidth, tv);
+            if (tv.type == TypedValue.TYPE_DIMENSION) {
+                caretWidth = TypedValue.complexToDimensionPixelSize(tv.data, dm);
+            } else {
+                caretWidth = tv.data;
+            }
+            a.getValue(R.styleable.MessageBubbleView_caretHeight, tv);
+            if (tv.type == TypedValue.TYPE_DIMENSION) {
+                caretHeight = TypedValue.complexToDimensionPixelSize(tv.data, dm);
+            } else {
+                caretHeight = tv.data;
+            }
+            setCaretSize(caretWidth, caretHeight);
         } else {
-            final Resources resources = getResources();
-            final float w = resources.getDisplayMetrics().density * 12;
+            final float w = dm.density * 12;
             final float h = w * 0.75f;
             setCaretSize(Math.round(w), Math.round(h));
         }
