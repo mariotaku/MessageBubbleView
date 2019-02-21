@@ -1,5 +1,4 @@
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,10 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:orientation="vertical">
 
         <org.mariotaku.messagebubbleview.library.MessageBubbleView
@@ -21,8 +20,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
-            android:minHeight="36dp"
             android:minWidth="48dp"
+            android:minHeight="36dp"
             app:bubbleColor="@color/color_messsage_bubble"
             app:caretPosition="topLeft"
             app:cornerRadius="4dp"
@@ -35,7 +34,7 @@
                 android:layout_margin="8dp"
                 android:text="@string/sample_status_text"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="?android:attr/textColorPrimary"/>
+                android:textColor="?android:attr/textColorPrimary" />
 
         </org.mariotaku.messagebubbleview.library.MessageBubbleView>
 
@@ -45,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/bubble"
             android:layout_marginTop="16dp"
-            android:entries="@array/entries_caret_position"/>
+            android:entries="@array/entries_caret_position" />
 
         <SeekBar
             android:id="@+id/seek_bar"
@@ -53,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/spinner"
             android:layout_marginTop="16dp"
-            android:max="192"/>
+            android:max="192" />
 
         <SeekBar
             android:id="@+id/width_seek_bar"
@@ -62,7 +61,7 @@
             android:layout_below="@+id/seek_bar"
             android:layout_marginTop="16dp"
             android:max="100"
-            android:progress="100"/>
+            android:progress="100" />
 
     </RelativeLayout>
 </ScrollView>

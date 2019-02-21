@@ -390,7 +390,13 @@ public class MessageBubbleView extends RelativeLayout {
         private void updatePath() {
             final Rect bounds = getBounds();
             final float radius = mCornerRadius;
-            final float caretWidth = mCaretWidth, caretHeight = mCaretHeight;
+            float caretWidth = mCaretWidth, caretHeight = mCaretHeight;
+            if (caretWidth < 0) {
+                caretWidth = bounds.width();
+            }
+            if (caretHeight < 0) {
+                caretHeight = bounds.height();
+            }
             mBubblePath.reset();
             switch (mAbsoluteCaretPosition) {
                 case TOP | LEFT: {
