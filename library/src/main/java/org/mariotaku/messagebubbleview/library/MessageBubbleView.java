@@ -86,7 +86,6 @@ public class MessageBubbleView extends RelativeLayout {
 
     public MessageBubbleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        //noinspection deprecation
         setBackgroundDrawable(new BackgroundDrawable());
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MessageBubbleView);
         setCornerRadius(a.getDimensionPixelSize(R.styleable.MessageBubbleView_cornerRadius, 0));
@@ -177,6 +176,19 @@ public class MessageBubbleView extends RelativeLayout {
     }
 
     @SuppressWarnings("unused")
+    public float getCenterCaretPosition() {
+        BackgroundDrawable drawable = getBackgroundDrawable();
+        return drawable.getCenterCaretOffset();
+    }
+
+    @SuppressWarnings("unused")
+    public void setCenterCaretOffset(float offset) {
+        final BackgroundDrawable background = getBackgroundDrawable();
+        background.setCenterCaretOffset(offset);
+        resetBackground();
+    }
+
+    @SuppressWarnings("unused")
     public void setCaretSize(@Px int width, @Px int height) {
         final BackgroundDrawable background = getBackgroundDrawable();
         background.setCaretSize(width, height);
@@ -254,6 +266,7 @@ public class MessageBubbleView extends RelativeLayout {
         private float mCaretWidth, mCaretHeight;
         private int mCaretPosition, mAbsoluteCaretPosition;
         private float mCornerRadius;
+        private float mCenterCaretOffset = 0.5f;
         private ColorStateList mColor;
         private boolean mOutlineEnabled;
 
@@ -371,6 +384,15 @@ public class MessageBubbleView extends RelativeLayout {
 
         int getCaretPosition() {
             return mCaretPosition;
+        }
+
+        void setCenterCaretOffset(float offset) {
+            mCenterCaretOffset = offset;
+            updatePath();
+        }
+
+        float getCenterCaretOffset() {
+            return mCenterCaretOffset;
         }
 
         ColorFilter getPaintColorFilter() {
@@ -545,8 +567,9 @@ public class MessageBubbleView extends RelativeLayout {
 
         private void updateBottomBubble(Path path, Rect bounds, float radius, float caretWidth,
                                         float caretHeight) {
-            path.moveTo(bounds.centerX(), bounds.bottom);
-            path.lineTo(bounds.centerX() - caretWidth / 2, bounds.bottom - caretHeight);
+            float caretCenter = bounds.left + radius + (bounds.width() - radius * 2 - caretWidth) * mCenterCaretOffset + caretWidth / 2;
+            path.moveTo(caretCenter, bounds.bottom);
+            path.lineTo(caretCenter - caretWidth / 2, bounds.bottom - caretHeight);
             path.lineTo(bounds.left + radius, bounds.bottom - caretHeight);
             path.cubicTo(bounds.left + radius * CONTROL_POINT_RATIO, bounds.bottom - caretHeight,
                     bounds.left, bounds.bottom - caretHeight - radius * CONTROL_POINT_RATIO,
@@ -563,14 +586,15 @@ public class MessageBubbleView extends RelativeLayout {
             path.cubicTo(bounds.right, bounds.bottom - caretHeight - radius * CONTROL_POINT_RATIO,
                     bounds.right - radius * CONTROL_POINT_RATIO, bounds.bottom - caretHeight,
                     bounds.right - radius, bounds.bottom - caretHeight);
-            path.lineTo(bounds.centerX() + caretWidth / 2, bounds.bottom - caretHeight);
+            path.lineTo(caretCenter + caretWidth / 2, bounds.bottom - caretHeight);
             path.close();
         }
 
         private void updateTopBubble(Path path, Rect bounds, float radius, float caretWidth,
                                      float caretHeight) {
-            path.moveTo(bounds.centerX(), bounds.top);
-            path.lineTo(bounds.centerX() - caretWidth / 2, bounds.top + caretHeight);
+            float caretCenter = bounds.left + radius + (bounds.width() - radius * 2 - caretWidth) * mCenterCaretOffset + caretWidth / 2;
+            path.moveTo(caretCenter, bounds.top);
+            path.lineTo(caretCenter - caretWidth / 2, bounds.top + caretHeight);
             path.lineTo(bounds.left + radius, bounds.top + caretHeight);
             path.cubicTo(bounds.left + radius * CONTROL_POINT_RATIO, bounds.top + caretHeight,
                     bounds.left, bounds.top + caretHeight + radius * CONTROL_POINT_RATIO,
@@ -587,14 +611,15 @@ public class MessageBubbleView extends RelativeLayout {
             path.cubicTo(bounds.right, bounds.top + caretHeight + radius * CONTROL_POINT_RATIO,
                     bounds.right - radius * CONTROL_POINT_RATIO, bounds.top + caretHeight,
                     bounds.right - radius, bounds.top + caretHeight);
-            path.lineTo(bounds.centerX() + caretWidth / 2, bounds.top + caretHeight);
+            path.lineTo(caretCenter + caretWidth / 2, bounds.top + caretHeight);
             path.close();
         }
 
         private void updateLeftHBubble(Path path, Rect bounds, float radius, float caretWidth,
                                        float caretHeight) {
-            path.moveTo(bounds.left, bounds.centerY());
-            path.lineTo(bounds.left + caretHeight, bounds.centerY() - caretHeight / 2);
+            float caretCenter = bounds.top + radius + (bounds.height() - radius * 2 - caretWidth) * mCenterCaretOffset + caretWidth / 2;
+            path.moveTo(bounds.left, caretCenter);
+            path.lineTo(bounds.left + caretHeight, caretCenter - caretHeight / 2);
             path.lineTo(bounds.left + caretHeight, bounds.top + radius);
             path.cubicTo(bounds.left + caretHeight, bounds.top + radius * CONTROL_POINT_RATIO,
                     bounds.left + caretHeight + radius * CONTROL_POINT_RATIO, bounds.top,
@@ -611,14 +636,15 @@ public class MessageBubbleView extends RelativeLayout {
             path.cubicTo(bounds.left + caretHeight + radius * CONTROL_POINT_RATIO, bounds.bottom,
                     bounds.left + caretHeight, bounds.bottom - radius * CONTROL_POINT_RATIO,
                     bounds.left + caretHeight, bounds.bottom - radius);
-            path.lineTo(bounds.left + caretHeight, bounds.centerY() + caretWidth / 2);
+            path.lineTo(bounds.left + caretHeight, caretCenter + caretWidth / 2);
             path.close();
         }
 
         private void updateRightHBubble(Path path, Rect bounds, float radius, float caretWidth,
                                         float caretHeight) {
-            path.moveTo(bounds.right, bounds.centerY());
-            path.lineTo(bounds.right - caretHeight, bounds.centerY() - caretHeight / 2);
+            float caretCenter = bounds.top + radius + (bounds.height() - radius * 2 - caretWidth) * mCenterCaretOffset + caretWidth / 2;
+            path.moveTo(bounds.right, caretCenter);
+            path.lineTo(bounds.right - caretHeight, caretCenter - caretHeight / 2);
             path.lineTo(bounds.right - caretHeight, bounds.top + radius);
             path.cubicTo(bounds.right - caretHeight, bounds.top + radius * CONTROL_POINT_RATIO,
                     bounds.right - caretHeight - radius * CONTROL_POINT_RATIO, bounds.top,
@@ -635,7 +661,7 @@ public class MessageBubbleView extends RelativeLayout {
             path.cubicTo(bounds.right - caretHeight - radius * CONTROL_POINT_RATIO, bounds.bottom,
                     bounds.right - caretHeight, bounds.bottom - radius * CONTROL_POINT_RATIO,
                     bounds.right - caretHeight, bounds.bottom - radius);
-            path.lineTo(bounds.right - caretHeight, bounds.centerY() + caretWidth / 2);
+            path.lineTo(bounds.right - caretHeight, caretCenter + caretWidth / 2);
             path.close();
         }
 
@@ -678,6 +704,7 @@ public class MessageBubbleView extends RelativeLayout {
             path.moveTo(bounds.right, bounds.top);
             path.close();
         }
+
     }
 
 }

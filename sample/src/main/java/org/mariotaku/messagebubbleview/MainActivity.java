@@ -37,6 +37,7 @@ public class MainActivity extends Activity {
     private MessageBubbleView bubble;
     private SeekBar seekBar;
     private SeekBar widthSeekBar;
+    private SeekBar offsetSeekBar;
     private Spinner spinner;
 
     @Override
@@ -44,6 +45,7 @@ public class MainActivity extends Activity {
         super.onContentChanged();
         seekBar = findViewById(R.id.seek_bar);
         widthSeekBar = findViewById(R.id.width_seek_bar);
+        offsetSeekBar = findViewById(R.id.offset_seek_bar);
         spinner = findViewById(R.id.spinner);
         bubble = findViewById(R.id.bubble);
     }
@@ -73,6 +75,22 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 bubble.setWrapContentMaxWidthPercent(progress / (float) seekBar.getMax());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        offsetSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                bubble.setCenterCaretOffset(progress / (float) seekBar.getMax());
             }
 
             @Override

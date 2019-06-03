@@ -63,5 +63,14 @@
             android:max="100"
             android:progress="100" />
 
+        <SeekBar
+            android:id="@+id/offset_seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/width_seek_bar"
+            android:layout_marginTop="16dp"
+            android:max="1000"
+            android:progress="500" />
+
     </RelativeLayout>
 </ScrollView>
