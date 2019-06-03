@@ -26,6 +26,8 @@ public class MainActivity extends Activity {
             MessageBubbleView.BOTTOM | MessageBubbleView.END,
             MessageBubbleView.BOTTOM | MessageBubbleView.VERTICAL,
             MessageBubbleView.TOP | MessageBubbleView.VERTICAL,
+            MessageBubbleView.LEFT | MessageBubbleView.HORIZONTAL,
+            MessageBubbleView.RIGHT | MessageBubbleView.HORIZONTAL,
             MessageBubbleView.TOP | MessageBubbleView.LEFT | MessageBubbleView.VERTICAL,
             MessageBubbleView.TOP | MessageBubbleView.RIGHT | MessageBubbleView.VERTICAL,
             MessageBubbleView.TOP | MessageBubbleView.START | MessageBubbleView.VERTICAL,

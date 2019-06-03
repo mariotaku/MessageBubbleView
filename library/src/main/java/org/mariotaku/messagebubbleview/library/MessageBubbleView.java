@@ -50,6 +50,7 @@ public class MessageBubbleView extends RelativeLayout {
     public static final int RIGHT = Gravity.RIGHT;
     public static final int START = Gravity.START;
     public static final int END = Gravity.END;
+    public static final int HORIZONTAL = Gravity.CLIP_HORIZONTAL;
     public static final int VERTICAL = Gravity.CLIP_VERTICAL;
 
     @Deprecated
@@ -437,6 +438,14 @@ public class MessageBubbleView extends RelativeLayout {
                     updateTopBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
                 }
+                case LEFT | HORIZONTAL: {
+                    updateLeftHBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
+                    break;
+                }
+                case RIGHT | HORIZONTAL: {
+                    updateRightHBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
+                    break;
+                }
                 case TOP | LEFT | VERTICAL: {
                     updateTopLeftVBubble(mBubblePath, bounds, radius, caretWidth, caretHeight);
                     break;
@@ -476,7 +485,6 @@ public class MessageBubbleView extends RelativeLayout {
                     bounds.left + radius, bounds.top);
             path.close();
         }
-
 
         private void updateTopLeftBubble(Path path, Rect bounds, float radius, float caretWidth,
                                          float caretHeight) {
@@ -580,6 +588,54 @@ public class MessageBubbleView extends RelativeLayout {
                     bounds.right - radius * CONTROL_POINT_RATIO, bounds.top + caretHeight,
                     bounds.right - radius, bounds.top + caretHeight);
             path.lineTo(bounds.centerX() + caretWidth / 2, bounds.top + caretHeight);
+            path.close();
+        }
+
+        private void updateLeftHBubble(Path path, Rect bounds, float radius, float caretWidth,
+                                       float caretHeight) {
+            path.moveTo(bounds.left, bounds.centerY());
+            path.lineTo(bounds.left + caretHeight, bounds.centerY() - caretHeight / 2);
+            path.lineTo(bounds.left + caretHeight, bounds.top + radius);
+            path.cubicTo(bounds.left + caretHeight, bounds.top + radius * CONTROL_POINT_RATIO,
+                    bounds.left + caretHeight + radius * CONTROL_POINT_RATIO, bounds.top,
+                    bounds.left + caretHeight + radius, bounds.top);
+            path.lineTo(bounds.right - radius, bounds.top);
+            path.cubicTo(bounds.right - radius * CONTROL_POINT_RATIO, bounds.top,
+                    bounds.right, bounds.top + radius * CONTROL_POINT_RATIO,
+                    bounds.right, bounds.top + radius);
+            path.lineTo(bounds.right, bounds.bottom - radius);
+            path.cubicTo(bounds.right, bounds.bottom - radius * CONTROL_POINT_RATIO,
+                    bounds.right - radius * CONTROL_POINT_RATIO, bounds.bottom,
+                    bounds.right - radius, bounds.bottom);
+            path.lineTo(bounds.left + caretHeight + radius, bounds.bottom);
+            path.cubicTo(bounds.left + caretHeight + radius * CONTROL_POINT_RATIO, bounds.bottom,
+                    bounds.left + caretHeight, bounds.bottom - radius * CONTROL_POINT_RATIO,
+                    bounds.left + caretHeight, bounds.bottom - radius);
+            path.lineTo(bounds.left + caretHeight, bounds.centerY() + caretWidth / 2);
+            path.close();
+        }
+
+        private void updateRightHBubble(Path path, Rect bounds, float radius, float caretWidth,
+                                        float caretHeight) {
+            path.moveTo(bounds.right, bounds.centerY());
+            path.lineTo(bounds.right - caretHeight, bounds.centerY() - caretHeight / 2);
+            path.lineTo(bounds.right - caretHeight, bounds.top + radius);
+            path.cubicTo(bounds.right - caretHeight, bounds.top + radius * CONTROL_POINT_RATIO,
+                    bounds.right - caretHeight - radius * CONTROL_POINT_RATIO, bounds.top,
+                    bounds.right - caretHeight - radius, bounds.top);
+            path.lineTo(bounds.left + radius, bounds.top);
+            path.cubicTo(bounds.left + radius * CONTROL_POINT_RATIO, bounds.top,
+                    bounds.left, bounds.top + radius * CONTROL_POINT_RATIO,
+                    bounds.left, bounds.top + radius);
+            path.lineTo(bounds.left, bounds.bottom - radius);
+            path.cubicTo(bounds.left, bounds.bottom - radius * CONTROL_POINT_RATIO,
+                    bounds.left + radius * CONTROL_POINT_RATIO, bounds.bottom,
+                    bounds.left + radius, bounds.bottom);
+            path.lineTo(bounds.right - caretHeight - radius, bounds.bottom);
+            path.cubicTo(bounds.right - caretHeight - radius * CONTROL_POINT_RATIO, bounds.bottom,
+                    bounds.right - caretHeight, bounds.bottom - radius * CONTROL_POINT_RATIO,
+                    bounds.right - caretHeight, bounds.bottom - radius);
+            path.lineTo(bounds.right - caretHeight, bounds.centerY() + caretWidth / 2);
             path.close();
         }
 
