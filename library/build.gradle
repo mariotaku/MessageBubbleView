@@ -7,13 +7,13 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 17
-        versionName "3.3"
+        versionCode 18
+        versionName "3.4"
     }
 }
 
 dependencies {
-    implementation 'androidx.core:core:1.0.1'
+    implementation 'androidx.core:core:1.0.2'
 }
 
 uploadArchives {

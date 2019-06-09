@@ -176,7 +176,7 @@ public class MessageBubbleView extends RelativeLayout {
     }
 
     @SuppressWarnings("unused")
-    public float getCenterCaretPosition() {
+    public float getCenterCaretOffset() {
         BackgroundDrawable drawable = getBackgroundDrawable();
         return drawable.getCenterCaretOffset();
     }
@@ -185,6 +185,19 @@ public class MessageBubbleView extends RelativeLayout {
     public void setCenterCaretOffset(float offset) {
         final BackgroundDrawable background = getBackgroundDrawable();
         background.setCenterCaretOffset(offset);
+        resetBackground();
+    }
+
+    @SuppressWarnings("unused")
+    public float getCenterCaretAbsOffset() {
+        BackgroundDrawable drawable = getBackgroundDrawable();
+        return drawable.getCenterCaretAbsOffset();
+    }
+
+    @SuppressWarnings("unused")
+    public void setCenterCaretAbsOffset(float offset) {
+        final BackgroundDrawable background = getBackgroundDrawable();
+        background.setCenterCaretAbsOffset(offset);
         resetBackground();
     }
 
